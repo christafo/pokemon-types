@@ -10,4 +10,5 @@
   font-weight: 700;
   color: #e94560;
   margin: 0 0 28px 0;
+  user-select: none;
 }
