@@ -1,11 +1,48 @@
 .matchup-card {
-  background: #16213e;
-  border-radius: 16px;
+  background: var(--bg-surface);
+  border-radius: 20px;
   padding: 24px;
   margin-top: 24px;
   max-width: 500px;
   margin-left: auto;
   margin-right: auto;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px var(--shadow);
+}
+
+.matchup-card::before {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -20px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(
+    to bottom,
+    var(--accent) 0%,
+    var(--accent) 45%,
+    var(--border) 45%,
+    var(--border) 55%,
+    var(--bg-surface) 55%,
+    var(--bg-surface) 100%
+  );
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+.matchup-card::after {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -20px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 8px solid var(--border);
+  opacity: 0.12;
+  pointer-events: none;
 }
 
 .pokemon-header {
@@ -16,6 +53,8 @@
   font-size: 28px;
   font-weight: 700;
   margin: 0 0 8px 0;
+  border-left: 4px solid var(--accent);
+  padding-left: 12px;
 }
 
 .pokemon-types {
@@ -26,7 +65,7 @@
 .matchup-section {
   margin-top: 20px;
   padding-top: 16px;
-  border-top: 1px solid #0f3460;
+  border-top: 1px solid var(--border);
 }
 
 .section-title {
@@ -49,7 +88,7 @@
 
 .group-label {
   font-size: 13px;
-  color: #999;
+  color: var(--text-muted);
   display: block;
   margin-bottom: 6px;
 }
@@ -61,7 +100,7 @@
 }
 
 .empty-note {
-  color: #666;
+  color: var(--text-dim);
   font-style: italic;
   font-size: 14px;
 }

@@ -2,13 +2,43 @@
   max-width: 540px;
   margin: 0 auto;
   padding: 40px 20px;
+  position: relative;
 }
 
 .app-title {
   text-align: center;
   font-size: 22px;
   font-weight: 700;
-  color: #e94560;
-  margin: 0 0 28px 0;
+  color: var(--accent);
+  margin: 0 0 4px 0;
   user-select: none;
+}
+
+.app-subtitle {
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-muted);
+  margin: 0 0 24px 0;
+}
+
+.theme-toggle {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: var(--bg-surface);
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px var(--shadow);
+}
+.theme-toggle:hover {
+  border-color: var(--border-focus);
+  transform: scale(1.05);
 }
