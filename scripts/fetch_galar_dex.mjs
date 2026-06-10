@@ -22,25 +22,24 @@ async function main() {
   const pokemonEntries = galarDex.pokemon_entries;
   console.log(`Found ${pokemonEntries.length} entries in Galar Pokédex`);
 
-  // Build a map of species name -> pokemon_species url (already have it from entries)
-  // Each entry has: { entry_number, pokemon_species: { name, url } }
-  // We need to fetch the pokemon (not species) to get types
-  // The species URL looks like: https://pokeapi.co/api/v2/pokemon-species/{id}/
-  // The pokemon URL is: https://pokeapi.co/api/v2/pokemon/{id}/
-
   const results = [];
   const BATCH_SIZE = 20;
 
+  // Extract Pokémon ID from species URL: https://pokeapi.co/api/v2/pokemon-species/{id}/
   for (let i = 0; i < pokemonEntries.length; i += BATCH_SIZE) {
     const batch = pokemonEntries.slice(i, i + BATCH_SIZE);
     const promises = batch.map(async (entry) => {
       const name = entry.pokemon_species.name;
+      const speciesUrl = entry.pokemon_species.url;
+      // Extract ID from URL
+      const parts = speciesUrl.replace(/\/$/, '').split('/');
+      const id = parts[parts.length - 1];
       try {
-        const pokemon = await fetchJSON(`https://pokeapi.co/api/v2/pokemon/${name}`);
+        const pokemon = await fetchJSON(`https://pokeapi.co/api/v2/pokemon/${id}`);
         const types = pokemon.types.map((t) => t.type.name);
         return { name, types };
       } catch (err) {
-        console.error(`  Failed to fetch ${name}: ${err.message}`);
+        console.error(`  Failed to fetch ${name} (id=${id}): ${err.message}`);
         return null;
       }
     });
@@ -50,7 +49,7 @@ async function main() {
 
     console.log(`  Processed ${Math.min(i + BATCH_SIZE, pokemonEntries.length)}/${pokemonEntries.length}`);
     if (i + BATCH_SIZE < pokemonEntries.length) {
-      await delay(100); // Small delay between batches
+      await delay(100);
     }
   }
 
