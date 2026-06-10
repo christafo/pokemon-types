@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { galarDex, PokemonEntry } from '../data/galarDex';
+import { galarDex } from '../data/galarDex';
+import type { PokemonEntry } from '../data/galarDex';
 import './SearchBar.css';
 
 interface SearchBarProps {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PokemonEntry } from './data/galarDex';
+import type { PokemonEntry } from './data/galarDex';
 import { calculateMatchups } from './utils/matchups';
 import { SearchBar } from './components/SearchBar';
 import { MatchupCard } from './components/MatchupCard';

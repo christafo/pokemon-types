@@ -1,5 +1,5 @@
-import { PokemonEntry } from '../data/galarDex';
-import { MatchupResult } from '../utils/matchups';
+import type { PokemonEntry } from '../data/galarDex';
+import type { MatchupResult } from '../utils/matchups';
 import { TypeBadge } from './TypeBadge';
 import './MatchupCard.css';
 
