@@ -18,6 +18,17 @@ export interface MatchupResult {
   };
 }
 
+function dedupeMaxMultipliers(items: TypeMultiplier[]): TypeMultiplier[] {
+  const map = new Map<string, TypeMultiplier>();
+  for (const item of items) {
+    const existing = map.get(item.type);
+    if (!existing || item.multiplier > existing.multiplier) {
+      map.set(item.type, item);
+    }
+  }
+  return Array.from(map.values()).sort((a, b) => b.multiplier - a.multiplier);
+}
+
 export function calculateMatchups(pokemonTypes: string[]): MatchupResult {
   const allTypes = Object.keys(typeChart);
 
@@ -35,25 +46,22 @@ export function calculateMatchups(pokemonTypes: string[]): MatchupResult {
     immuneTo: defensiveMultipliers.filter(m => m.multiplier === 0),
   };
 
-  // OFFENSIVE: union of each Pokémon type's effectiveness against all types
-  const offensive = {
-    superEffective: [] as TypeMultiplier[],
-    notEffective: [] as TypeMultiplier[],
-    noEffect: [] as TypeMultiplier[],
-  };
-
+  // OFFENSIVE: union of each Pokémon type's effectiveness against all types, deduped
+  const offensiveRaw: TypeMultiplier[] = [];
   for (const pokeType of pokemonTypes) {
     for (const targetType of allTypes) {
       const mult = typeChart[pokeType]?.[targetType] ?? 1;
-      if (mult > 1) {
-        offensive.superEffective.push({ type: targetType, multiplier: mult });
-      } else if (mult > 0 && mult < 1) {
-        offensive.notEffective.push({ type: targetType, multiplier: mult });
-      } else if (mult === 0) {
-        offensive.noEffect.push({ type: targetType, multiplier: mult });
+      if (mult !== 1) {
+        offensiveRaw.push({ type: targetType, multiplier: mult });
       }
     }
   }
+
+  const offensive = {
+    superEffective: dedupeMaxMultipliers(offensiveRaw.filter(m => m.multiplier > 1)),
+    notEffective: dedupeMaxMultipliers(offensiveRaw.filter(m => m.multiplier > 0 && m.multiplier < 1)),
+    noEffect: dedupeMaxMultipliers(offensiveRaw.filter(m => m.multiplier === 0)),
+  };
 
   return { offensive, defensive };
 }

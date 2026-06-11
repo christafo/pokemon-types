@@ -104,6 +104,24 @@
   font-weight: 500;
 }
 
+.dropdown-id {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--text-dim);
+  font-weight: 400;
+}
+
+.no-results {
+  padding: 16px 18px;
+  color: var(--text-muted);
+  font-size: 14px;
+  text-align: center;
+  background: var(--bg-surface);
+  border-radius: 0 0 16px 16px;
+  border: 2px solid var(--border);
+  border-top: none;
+}
+
 @media (min-width: 768px) {
   .search-container {
     max-width: 640px;

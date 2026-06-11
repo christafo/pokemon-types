@@ -34,7 +34,7 @@
 }
 
 .mobile-nav-item.active {
-  color: var(--accent-red);
+  color: var(--pokemon-yellow);
 }
 
 .mobile-nav-dot {
@@ -45,7 +45,7 @@
   width: 20px;
   height: 3px;
   border-radius: 0 0 3px 3px;
-  background: var(--accent-red);
+  background: var(--pokemon-yellow);
   opacity: 0;
   transition: opacity 0.15s;
 }

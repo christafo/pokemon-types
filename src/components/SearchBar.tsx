@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { galarDex } from '../data/galarDex';
 import type { PokemonEntry } from '../data/galarDex';
 import './SearchBar.css';
@@ -14,9 +14,20 @@ export function SearchBar({ onSelect }: SearchBarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const filtered = query.trim() === '' ? [] : galarDex
-    .filter(p => p.name.startsWith(query.toLowerCase()))
-    .slice(0, 10);
+  const filtered = useMemo(() => {
+    if (query.trim() === '') return [];
+    const q = query.toLowerCase().trim();
+    return galarDex
+      .filter(p => p.name.includes(q))
+      .sort((a, b) => {
+        // Prefix matches first, then alphabetical
+        const aStarts = a.name.startsWith(q) ? 0 : 1;
+        const bStarts = b.name.startsWith(q) ? 0 : 1;
+        if (aStarts !== bStarts) return aStarts - bStarts;
+        return a.name.localeCompare(b.name);
+      })
+      .slice(0, 10);
+  }, [query]);
 
   useEffect(() => {
     setSelectedIndex(-1);
@@ -100,9 +111,13 @@ export function SearchBar({ onSelect }: SearchBarProps) {
               onTouchEnd={(e) => { e.preventDefault(); handleSelect(p); }}
             >
               <span className="dropdown-name">{p.name.charAt(0).toUpperCase() + p.name.slice(1)}</span>
+              <span className="dropdown-id">#{p.id}</span>
             </li>
           ))}
         </ul>
+      )}
+      {showDropdown && query && filtered.length === 0 && (
+        <div className="no-results">No matching Pokémon found</div>
       )}
     </div>
   );

@@ -6,7 +6,7 @@ function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     const saved = localStorage.getItem('pokemon-types-theme');
     if (saved === 'light' || saved === 'dark') return saved;
-    return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    return 'light'; // Default to light mode
   });
 
   useEffect(() => {
