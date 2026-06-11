@@ -12,6 +12,7 @@ export function SearchBar({ onSelect }: SearchBarProps) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const filtered = query.trim() === '' ? [] : galarDex
     .filter(p => p.name.startsWith(query.toLowerCase()))
@@ -52,19 +53,23 @@ export function SearchBar({ onSelect }: SearchBarProps) {
     }
   };
 
-  // Close dropdown when clicking outside
+  // Close dropdown when clicking/tapping outside the entire search container
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (inputRef.current && !inputRef.current.parentElement?.contains(e.target as Node)) {
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setShowDropdown(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
   }, []);
 
   return (
-    <div className="search-container">
+    <div className="search-container" ref={containerRef}>
       <div className="search-input-wrapper">
         <span className="search-icon" aria-hidden="true">🔍</span>
         <input
@@ -91,7 +96,8 @@ export function SearchBar({ onSelect }: SearchBarProps) {
               key={p.name}
               className={`dropdown-item ${i === selectedIndex ? 'selected' : ''}`}
               onMouseEnter={() => setSelectedIndex(i)}
-              onClick={() => handleSelect(p)}
+              onMouseDown={(e) => { e.preventDefault(); handleSelect(p); }}
+              onTouchEnd={(e) => { e.preventDefault(); handleSelect(p); }}
             >
               <span className="dropdown-name">{p.name.charAt(0).toUpperCase() + p.name.slice(1)}</span>
             </li>

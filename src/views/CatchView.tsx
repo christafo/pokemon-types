@@ -20,6 +20,7 @@ interface CatchCandidate {
   locations: { name: string; method: string; rate: number; levelMin: number; levelMax: number }[];
   score: number;
   multiplier: number;
+  bst: number; // base stat total — used for sorting when no target
 }
 
 export function CatchView() {
@@ -36,24 +37,26 @@ export function CatchView() {
     return map;
   }, []);
 
+  // Two modes:
+  // 1. Level-only: show Pokémon available at that level, sorted by BST (strongest first)
+  // 2. Target + level: show counters against the target available at that level
   const candidates = useMemo(() => {
-    if (!target) return [];
+    if (level <= 0 && !target) return [];
 
-    const targetTypes = target.types;
-
-    // Find all types that are SE against target
-    const seTypes = new Map<string, number>();
-    for (const [type, chart] of Object.entries(typeChart)) {
-      const mult = targetTypes.reduce((acc, tt) => acc * (chart[tt] ?? 1), 1);
-      if (mult > 1) seTypes.set(type, mult);
-    }
-
-    // Find all wild encounters at the user's level (or all if no level set)
     const candidateMap = new Map<string, CatchCandidate>();
+
+    // If we have a target, calculate which types are SE against it
+    const seTypes = target ? new Map<string, number>() : null;
+    if (target && seTypes) {
+      for (const [type, chart] of Object.entries(typeChart)) {
+        const mult = target.types.reduce((acc, tt) => acc * (chart[tt] ?? 1), 1);
+        if (mult > 1) seTypes.set(type, mult);
+      }
+    }
 
     for (const loc of locationEncounters) {
       for (const enc of loc.encounters) {
-        // Filter by level
+        // Filter by level (if set)
         if (level > 0 && (enc.levelMin > level || enc.levelMax < level)) continue;
 
         // Filter by version
@@ -63,50 +66,100 @@ export function CatchView() {
         const dexEntry = dexByName.get(enc.normalizedName);
         if (!dexEntry) continue;
 
-        // Check if this Pokémon has any SE type against target
-        const bestMult = dexEntry.types.reduce((best, t) => {
-          const m = seTypes.get(t) || 1;
-          return m > best ? m : best;
-        }, 0);
-
-        if (bestMult <= 1) continue; // Not a counter
-
         const key = enc.normalizedName;
-        const existing = candidateMap.get(key);
-        const locationInfo = {
-          name: loc.name,
-          method: enc.method,
-          rate: enc.rate,
-          levelMin: enc.levelMin,
-          levelMax: enc.levelMax,
-        };
 
-        if (existing) {
-          existing.locations.push(locationInfo);
-          // Keep best score
-          if (bestMult > existing.multiplier) {
-            existing.multiplier = bestMult;
-            existing.score = bestMult * (dexEntry.types.filter(t => seTypes.has(t)).length);
+        // If we have a target, check if this Pokémon is a counter
+        if (seTypes && target) {
+          const bestMult = dexEntry.types.reduce((best, t) => {
+            const m = seTypes.get(t) || 1;
+            return m > best ? m : best;
+          }, 0);
+
+          if (bestMult <= 1) continue; // Not a counter, skip
+
+          const existing = candidateMap.get(key);
+          const locationInfo = {
+            name: loc.name,
+            method: enc.method,
+            rate: enc.rate,
+            levelMin: enc.levelMin,
+            levelMax: enc.levelMax,
+          };
+
+          const details = pokemonDetails[key];
+          const bst = details
+            ? Object.values(details.stats).reduce((a, b) => a + b, 0)
+            : 0;
+
+          if (existing) {
+            existing.locations.push(locationInfo);
+            if (bestMult > existing.multiplier) {
+              existing.multiplier = bestMult;
+              existing.score = bestMult * dexEntry.types.filter(t => seTypes.has(t)).length;
+            }
+          } else {
+            candidateMap.set(key, {
+              name: dexEntry.name,
+              types: dexEntry.types,
+              id: dexEntry.id || details?.id,
+              locations: [locationInfo],
+              score: bestMult * dexEntry.types.filter(t => seTypes.has(t)).length,
+              multiplier: bestMult,
+              bst,
+            });
           }
         } else {
+          // No target — just collect all available Pokémon
+          const existing = candidateMap.get(key);
+          const locationInfo = {
+            name: loc.name,
+            method: enc.method,
+            rate: enc.rate,
+            levelMin: enc.levelMin,
+            levelMax: enc.levelMax,
+          };
+
           const details = pokemonDetails[key];
-          candidateMap.set(key, {
-            name: dexEntry.name,
-            types: dexEntry.types,
-            id: dexEntry.id || details?.id,
-            locations: [locationInfo],
-            score: bestMult * dexEntry.types.filter(t => seTypes.has(t)).length,
-            multiplier: bestMult,
-          });
+          const bst = details
+            ? Object.values(details.stats).reduce((a, b) => a + b, 0)
+            : 0;
+
+          if (existing) {
+            existing.locations.push(locationInfo);
+            // Keep the highest rate location as the primary
+            if (locationInfo.rate > existing.locations[0].rate) {
+              existing.locations.unshift(locationInfo);
+            }
+          } else {
+            candidateMap.set(key, {
+              name: dexEntry.name,
+              types: dexEntry.types,
+              id: dexEntry.id || details?.id,
+              locations: [locationInfo],
+              score: bst, // Use BST as score when no target
+              multiplier: 1,
+              bst,
+            });
+          }
         }
       }
     }
 
-    return [...candidateMap.values()]
-      .sort((a, b) => b.score - a.score || b.multiplier - a.multiplier)
-      .slice(0, 10);
+    const results = [...candidateMap.values()];
+
+    if (seTypes && target) {
+      // Sort by counter score (best counter first)
+      results.sort((a, b) => b.score - a.score || b.multiplier - a.multiplier);
+    } else {
+      // Sort by BST (strongest Pokémon first) then by encounter rate
+      results.sort((a, b) => b.bst - a.bst);
+    }
+
+    return results.slice(0, 15);
 
   }, [target, level, version, dexByName]);
+
+  const hasLevel = level > 0;
 
   return (
     <div className="catch-view">
@@ -127,7 +180,7 @@ export function CatchView() {
       </div>
 
       <div className="catch-target">
-        <SectionHeader icon="🎯" title="What are you fighting?" />
+        <SectionHeader icon="🎯" title="What are you fighting?" subtitle="Optional — set a target for counter suggestions" />
         <SearchBar onSelect={setTarget} />
 
         {target && (
@@ -138,6 +191,7 @@ export function CatchView() {
             <div className="catch-target-types">
               {target.types.map(t => <TypeBadge key={t} type={t} />)}
             </div>
+            <button className="catch-target-clear" onClick={() => setTarget(null)}>✕</button>
           </div>
         )}
       </div>
@@ -145,9 +199,16 @@ export function CatchView() {
       {candidates.length > 0 ? (
         <div className="catch-results">
           <SectionHeader
-            icon="⚔️"
-            title="Best Catches"
-            subtitle={level > 0 ? `Available around Lv${level}` : 'From all locations'}
+            icon={target ? '⚔️' : '🌐'}
+            title={target ? 'Best Counters' : 'Available to Catch'}
+            subtitle={hasLevel
+              ? target
+                ? `Strong against ${target.name} at Lv${level}`
+                : `Pokémon available around Lv${level}, strongest first`
+              : target
+                ? `Strong against ${target.name} from all levels`
+                : 'Set your level to see available Pokémon'
+            }
           />
           {candidates.map(c => (
             <div key={c.name} className="counter-group">
@@ -157,14 +218,15 @@ export function CatchView() {
                 <div className="counter-types">
                   {c.types.map(t => <TypeBadge key={t} type={t} />)}
                 </div>
-                <span className="counter-mult">×{c.multiplier}</span>
+                {target && <span className="counter-mult">×{c.multiplier}</span>}
+                {!target && c.bst > 0 && <span className="counter-bst">BST {c.bst}</span>}
               </div>
               <div className="counter-locations">
                 {c.locations.slice(0, 3).map((loc, i) => (
                   <div key={i} className="counter-location">
                     <span className="loc-name">{loc.name}</span>
                     <span className="loc-detail">{loc.method}</span>
-                    <span className="loc-detail">Lv {loc.levelMin}-{loc.levelMax}</span>
+                    <span className="loc-detail">Lv {loc.levelMin}–{loc.levelMax}</span>
                     <span className="loc-detail">{loc.rate}%</span>
                   </div>
                 ))}
@@ -175,13 +237,15 @@ export function CatchView() {
             </div>
           ))}
         </div>
-      ) : target ? (
-        <EmptyState message={level > 0
-          ? `No strong counters found at Lv${level}. Try a different level or check all levels.`
-          : "No strong counter types found for this Pokémon"}
-        />
+      ) : hasLevel || target ? (
+        <EmptyState message={hasLevel
+          ? target
+            ? `No strong counters found at Lv${level}. Try a different level.`
+            : `No Pokémon found at Lv${level} for ${version}. Try adjusting the level.`
+          : "No strong counter types found for this Pokémon"
+        } />
       ) : (
-        <EmptyState message="Search for a Pokémon to see catch suggestions" />
+        <EmptyState message="Set your level to see available Pokémon, or search for a target to get counter suggestions" />
       )}
     </div>
   );
