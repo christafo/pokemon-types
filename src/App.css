@@ -1,44 +1,55 @@
-.app {
-  max-width: 540px;
-  margin: 0 auto;
-  padding: 40px 20px;
-  position: relative;
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-.app-title {
-  text-align: center;
+.app-body {
+  display: flex;
+  flex: 1;
+  padding-top: 56px; /* header height */
+  padding-bottom: 56px; /* mobile nav height */
+}
+
+.app-content {
+  flex: 1;
+  padding: 20px 16px;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.view {
+  animation: slideUp 0.2s ease-out;
+}
+
+.view-header {
+  margin-bottom: 24px;
+}
+
+.view-header h2 {
   font-size: 22px;
   font-weight: 700;
   color: var(--accent);
   margin: 0 0 4px 0;
-  user-select: none;
 }
 
-.app-subtitle {
-  text-align: center;
-  font-size: 14px;
+.view-header p {
   color: var(--text-muted);
-  margin: 0 0 24px 0;
+  font-size: 14px;
+  margin: 0;
 }
 
-.theme-toggle {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: var(--bg-surface);
-  border: 2px solid var(--border);
-  border-radius: 50%;
-  width: 42px;
-  height: 42px;
-  font-size: 20px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  box-shadow: 0 2px 8px var(--shadow);
+.coming-soon {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-dim);
 }
-.theme-toggle:hover {
-  border-color: var(--border-focus);
-  transform: scale(1.05);
+
+/* Desktop: remove mobile nav padding, sidebar is shown */
+@media (min-width: 768px) {
+  .app-body {
+    padding-bottom: 0;
+  }
 }
