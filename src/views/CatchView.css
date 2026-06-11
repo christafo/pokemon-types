@@ -1,0 +1,92 @@
+.catch-view { animation: slideUp 0.2s ease-out; }
+
+.catch-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+}
+.catch-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.catch-target { margin-bottom: 24px; }
+
+.catch-target-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 12px;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+.catch-target-name {
+  font-weight: 700;
+  font-size: 16px;
+}
+.catch-target-types {
+  display: flex;
+  gap: 6px;
+}
+
+.catch-results { margin-top: 24px; }
+
+.counter-group {
+  margin-bottom: 16px;
+  padding: 14px;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+.counter-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.counter-mult {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.counter-candidates {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.counter-pokemon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: var(--bg-card-hover);
+  border-radius: var(--radius-sm);
+}
+.counter-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+.counter-types {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+@media (min-width: 768px) {
+  .catch-settings {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+  .catch-setting { flex: 1; }
+}

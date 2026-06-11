@@ -3,6 +3,7 @@ import type { PokemonEntry } from '../data/galarDex';
 import { calculateMatchups } from '../utils/matchups';
 import { SearchBar } from '../components/SearchBar';
 import { MatchupCard } from '../components/MatchupCard';
+import { EmptyState } from '../components/EmptyState';
 
 export function LookupView() {
   const [selected, setSelected] = useState<PokemonEntry | null>(null);
@@ -10,13 +11,11 @@ export function LookupView() {
 
   return (
     <div className="lookup-view">
-      <div className="view-header">
-        <h2>🔍 Type Lookup</h2>
-        <p>Search for a Pokémon to see its type matchups</p>
-      </div>
       <SearchBar onSelect={setSelected} />
-      {selected && matchups && (
+      {selected && matchups ? (
         <MatchupCard pokemon={selected} matchups={matchups} />
+      ) : (
+        <EmptyState message="Search for a Pokémon to see type matchups" />
       )}
     </div>
   );
