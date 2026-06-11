@@ -46,6 +46,12 @@
   pointer-events: none;
 }
 
+.pokemon-sprite-area {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
 .pokemon-header {
   margin-bottom: 20px;
 }
@@ -58,9 +64,57 @@
   padding-left: 12px;
 }
 
+.pokemon-dex-number {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-dim);
+  margin-left: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pokemon-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
 .pokemon-types {
   display: flex;
   gap: 8px;
+}
+
+.card-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--border);
+  margin: 16px 0;
+  overflow-x: auto;
+}
+
+.card-tab {
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  white-space: nowrap;
+  transition: all 0.15s;
+  min-height: 44px;
+}
+
+.card-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.card-tab:hover {
+  color: var(--text);
 }
 
 .matchup-section {
@@ -122,6 +176,63 @@
   color: var(--text-dim);
   font-style: italic;
   font-size: 14px;
+}
+
+/* Evolution chain */
+.evolution-chain {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.evo-stage {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.evo-arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.evo-method {
+  font-size: 10px;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.evo-arrow-icon {
+  font-size: 20px;
+  color: var(--text-muted);
+}
+
+.evo-pokemon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  background: var(--bg-card-hover, var(--bg-input));
+  border-radius: var(--radius-md);
+  min-width: 80px;
+}
+
+.evo-name {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.evo-types {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 @media (min-width: 768px) {

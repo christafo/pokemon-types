@@ -1,5 +1,6 @@
 import type { PokemonEntry } from '../data/galarDex';
 import { TypeBadge } from './TypeBadge';
+import { PokemonSprite } from './PokemonSprite';
 import './PartySlot.css';
 
 interface Props {
@@ -17,15 +18,18 @@ export function PartySlot({ pokemon, onRemove, onAdd }: Props) {
     );
   }
 
+  const displayName = pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1);
+
   return (
     <div className="party-slot filled">
-      <div className="party-slot-name">
-        {pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}
+      <button className="party-slot-remove" onClick={onRemove} aria-label="Remove">✕</button>
+      <div className="party-slot-sprite">
+        <PokemonSprite id={pokemon.id} size="thumb" types={pokemon.types} />
       </div>
+      <div className="party-slot-name">{displayName}</div>
       <div className="party-slot-types">
         {pokemon.types.map(t => <TypeBadge key={t} type={t} />)}
       </div>
-      <button className="party-slot-remove" onClick={onRemove} aria-label="Remove">✕</button>
     </div>
   );
 }

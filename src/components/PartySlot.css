@@ -32,6 +32,11 @@
   gap: 4px;
 }
 
+.party-slot-sprite {
+  display: flex;
+  justify-content: center;
+}
+
 .party-slot-name {
   font-size: 12px;
   font-weight: 600;

@@ -43,3 +43,13 @@
   color: var(--text-dim);
   font-variant-numeric: tabular-nums;
 }
+
+.grid-card-sprite {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.grid-card-sprite .pokemon-sprite img {
+  image-rendering: auto; /* smooth for official artwork */
+}
