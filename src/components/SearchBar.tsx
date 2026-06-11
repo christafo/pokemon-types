@@ -29,6 +29,13 @@ export function SearchBar({ onSelect }: SearchBarProps) {
     inputRef.current?.focus();
   };
 
+  const handleClear = () => {
+    setQuery('');
+    setShowDropdown(false);
+    setSelectedIndex(-1);
+    inputRef.current?.focus();
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!showDropdown || filtered.length === 0) return;
     if (e.key === 'ArrowDown') {
@@ -45,19 +52,38 @@ export function SearchBar({ onSelect }: SearchBarProps) {
     }
   };
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (inputRef.current && !inputRef.current.parentElement?.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
     <div className="search-container">
-      <input
-        ref={inputRef}
-        type="text"
-        className="search-input"
-        placeholder="Type a Pokémon name..."
-        value={query}
-        onChange={e => { setQuery(e.target.value); setShowDropdown(true); }}
-        onFocus={() => setShowDropdown(true)}
-        onKeyDown={handleKeyDown}
-        autoComplete="off"
-      />
+      <div className="search-input-wrapper">
+        <span className="search-icon" aria-hidden="true">🔍</span>
+        <input
+          ref={inputRef}
+          type="text"
+          className="search-input"
+          placeholder="Type a Pokémon name..."
+          value={query}
+          onChange={e => { setQuery(e.target.value); setShowDropdown(true); }}
+          onFocus={() => setShowDropdown(true)}
+          onKeyDown={handleKeyDown}
+          autoComplete="off"
+        />
+        {query && (
+          <button className="search-clear" onClick={handleClear} aria-label="Clear search" type="button">
+            ×
+          </button>
+        )}
+      </div>
       {showDropdown && filtered.length > 0 && (
         <ul className="search-dropdown">
           {filtered.map((p, i) => (
@@ -67,7 +93,7 @@ export function SearchBar({ onSelect }: SearchBarProps) {
               onMouseEnter={() => setSelectedIndex(i)}
               onClick={() => handleSelect(p)}
             >
-              {p.name}
+              <span className="dropdown-name">{p.name.charAt(0).toUpperCase() + p.name.slice(1)}</span>
             </li>
           ))}
         </ul>

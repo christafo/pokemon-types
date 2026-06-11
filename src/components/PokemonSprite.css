@@ -1,0 +1,38 @@
+.pokemon-sprite {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pokemon-sprite img {
+  image-rendering: pixelated;
+  border-radius: var(--radius-md);
+}
+
+.pokemon-sprite.sprite-glow::before {
+  content: '';
+  position: absolute;
+  inset: 20%;
+  border-radius: 50%;
+  background: var(--glow-color);
+  filter: blur(30px);
+  opacity: 0.3;
+  z-index: -1;
+}
+
+.sprite-placeholder {
+  display: none;
+  color: var(--text-dim);
+  align-items: center;
+  justify-content: center;
+}
+
+.sprite-placeholder.show {
+  display: flex;
+}
+
+.sprite-thumb .sprite-placeholder svg {
+  width: 24px;
+  height: 24px;
+}

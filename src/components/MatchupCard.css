@@ -9,15 +9,16 @@
   position: relative;
   overflow: hidden;
   box-shadow: 0 4px 20px var(--shadow);
+  animation: slideUp 0.3s ease-out;
 }
 
 .matchup-card::before {
   content: '';
   position: absolute;
-  top: -30px;
+  bottom: -30px;
   right: -20px;
-  width: 120px;
-  height: 120px;
+  width: 160px;
+  height: 160px;
   border-radius: 50%;
   background: linear-gradient(
     to bottom,
@@ -35,10 +36,10 @@
 .matchup-card::after {
   content: '';
   position: absolute;
-  top: -30px;
+  bottom: -30px;
   right: -20px;
-  width: 120px;
-  height: 120px;
+  width: 160px;
+  height: 160px;
   border-radius: 50%;
   border: 8px solid var(--border);
   opacity: 0.12;
@@ -63,9 +64,21 @@
 }
 
 .matchup-section {
-  margin-top: 20px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
+  border-top: none;
+  position: relative;
+  margin-top: 24px;
+  padding-top: 20px;
+}
+
+.matchup-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(to right, var(--accent), transparent);
+  border-radius: 1px;
 }
 
 .section-title {
@@ -76,10 +89,16 @@
 
 .offense-title {
   color: #f7d02c;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .defense-title {
   color: #6390f0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .matchup-group {
@@ -103,4 +122,10 @@
   color: var(--text-dim);
   font-style: italic;
   font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  .matchup-card {
+    max-width: 640px;
+  }
 }

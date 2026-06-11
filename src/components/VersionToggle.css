@@ -1,0 +1,26 @@
+.version-toggle {
+  display: flex;
+  background: var(--bg-input);
+  border-radius: 20px;
+  padding: 2px;
+  border: 1px solid var(--border);
+}
+
+.version-toggle button {
+  padding: 6px 16px;
+  min-height: 44px;
+  min-width: 44px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 18px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.version-toggle button.active {
+  background: var(--accent-red);
+  color: white;
+}
