@@ -1,10 +1,18 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { galarDex } from '../data/galarDex';
 import type { PokemonEntry } from '../data/galarDex';
 import './SearchBar.css';
 
 interface SearchBarProps {
   onSelect: (pokemon: PokemonEntry) => void;
+}
+
+function simpleFuzzyMatch(query: string, name: string): boolean {
+  const q = query.toLowerCase().trim();
+  const n = name.toLowerCase();
+  if (n.includes(q)) return true;
+  // Simple Levenshtein-like for close matches
+  return n.split('').filter((c, i) => q[i] === c).length > q.length * 0.6;
 }
 
 export function SearchBar({ onSelect }: SearchBarProps) {
@@ -14,9 +22,14 @@ export function SearchBar({ onSelect }: SearchBarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const filtered = query.trim() === '' ? [] : galarDex
-    .filter(p => p.name.startsWith(query.toLowerCase()))
-    .slice(0, 10);
+  const filtered = useMemo(() => {
+    if (query.trim() === '') return [];
+    const q = query.toLowerCase().trim();
+    return galarDex
+      .filter(p => simpleFuzzyMatch(q, p.name))
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .slice(0, 12);
+  }, [query]);
 
   useEffect(() => {
     setSelectedIndex(-1);
@@ -53,7 +66,6 @@ export function SearchBar({ onSelect }: SearchBarProps) {
     }
   };
 
-  // Close dropdown when clicking/tapping outside the entire search container
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent | TouchEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
@@ -100,9 +112,13 @@ export function SearchBar({ onSelect }: SearchBarProps) {
               onTouchEnd={(e) => { e.preventDefault(); handleSelect(p); }}
             >
               <span className="dropdown-name">{p.name.charAt(0).toUpperCase() + p.name.slice(1)}</span>
+              <span className="dropdown-id">#{p.id}</span>
             </li>
           ))}
         </ul>
+      )}
+      {showDropdown && query && filtered.length === 0 && (
+        <div className="no-results">No matching Pokémon found. Try another name!</div>
       )}
     </div>
   );
